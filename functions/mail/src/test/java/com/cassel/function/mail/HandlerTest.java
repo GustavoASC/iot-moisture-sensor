@@ -1,91 +1,15 @@
-package com.cassel.function.sensorhandler;
+package com.cassel.function.mail;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 import java.util.Map;
 import java.util.Optional;
-
 import com.openfaas.model.IRequest;
 
 public class HandlerTest {
-    
-    @Test
-    public void validBodyContent() {
-        Handler handler = new Handler();
-        IRequest req = new AbstractRequest() {
 
-            @Override
-            public String getBody() {
-                return "{ \"moisture\": 10}";
-            }
-    
-        };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.of(10.0), moisture);
-    }
-    
     @Test
-    public void negativeBodyContent() {
-        Handler handler = new Handler();
-        IRequest req = new AbstractRequest() {
-
-            @Override
-            public String getBody() {
-                return "{ \"moisture\": -1}";
-            }
-    
-        };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.of(-1.0), moisture);
-    }
-    
-    @Test
-    public void invalidBodyContent() {
-        Handler handler = new Handler();
-        IRequest req = new AbstractRequest() {
-
-            @Override
-            public String getBody() {
-                return "{ \"moisture\": \"abc\"}";
-            }
-    
-        };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.empty(), moisture);
-    }
-    
-    @Test
-    public void missingBodyContent() {
-        Handler handler = new Handler();
-        IRequest req = new AbstractRequest() {
-
-            @Override
-            public String getBody() {
-                return "{ \"abc\": \"abc\"}";
-            }
-    
-        };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.empty(), moisture);
-    }
-    
-    @Test
-    public void emptyMoistureContent() {
-        Handler handler = new Handler();
-        IRequest req = new AbstractRequest() {
-
-            @Override
-            public String getBody() {
-                return "{ \"moisture\": \"\"}";
-            }
-    
-        };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.empty(), moisture);
-    }
-    
-    @Test
-    public void emptyBodyContent() {
+    public void emptyBody() {
         Handler handler = new Handler();
         IRequest req = new AbstractRequest() {
 
@@ -95,25 +19,102 @@ public class HandlerTest {
             }
     
         };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.empty(), moisture);
+        assertEquals(Optional.empty(), handler.parseJsonMail(req));
     }
-    
+
     @Test
-    public void wrongFormatBodyContent() {
+    public void emptyJson() {
         Handler handler = new Handler();
         IRequest req = new AbstractRequest() {
 
             @Override
             public String getBody() {
-                return "xyz";
+                return "{}";
             }
     
         };
-        var moisture = handler.extractMoisture(req);
-        assertEquals(Optional.empty(), moisture);
+        assertEquals(Optional.empty(), handler.parseJsonMail(req));
     }
 
+    @Test
+    public void onlyRecipient() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{\"recipient\": \"teste@gmail.com\"}";
+            }
+    
+        };
+        assertEquals(Optional.empty(), handler.parseJsonMail(req));
+    }
+
+    @Test
+    public void onlyRecipientAndSubject() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{\"recipient\": \"teste@gmail.com\", \"subject\": \"my subject\"}";
+            }
+    
+        };
+        assertEquals(Optional.empty(), handler.parseJsonMail(req));
+    }
+
+    @Test
+    public void onlyRecipientAndText() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{\"recipient\": \"teste@gmail.com\", \"text\": \"my text\"}";
+            }
+    
+        };
+        assertEquals(Optional.empty(), handler.parseJsonMail(req));
+    }
+
+    @Test
+    public void validJsonContent() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{\"recipient\": \"teste@gmail.com\", \"text\": \"my text\", \"subject\": \"my subject\"}";
+            }
+    
+        };
+        var mail = handler.parseJsonMail(req).get();
+        assertEquals("teste@gmail.com", mail.getTo());
+        assertEquals("my subject", mail.getSubject());
+        assertEquals("my text", mail.getText());
+
+
+
+        handler.Handle(req);
+    }
+
+    @Test
+    public void emptyFields() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{\"recipient\": \"\", \"text\": \"\", \"subject\": \"\"}";
+            }
+    
+        };
+        var mail = handler.parseJsonMail(req).get();
+        assertEquals("", mail.getTo());
+        assertEquals("", mail.getSubject());
+        assertEquals("", mail.getText());
+    }
 
     private class AbstractRequest implements IRequest {
 
@@ -153,5 +154,5 @@ public class HandlerTest {
         }
 
     }
-    
+
 }

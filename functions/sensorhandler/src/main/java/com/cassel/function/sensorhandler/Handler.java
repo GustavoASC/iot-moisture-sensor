@@ -5,7 +5,6 @@ import com.openfaas.model.IResponse;
 import com.openfaas.model.IRequest;
 import com.openfaas.model.Response;
 import java.util.Optional;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class Handler implements IHandler {
@@ -25,8 +24,11 @@ public class Handler implements IHandler {
 
     Optional<Double> extractMoisture(IRequest req) {
         String payload = req.getBody();
-        JsonObject json = JsonParser.parseString(payload)
-                                    .getAsJsonObject();
+        var element = JsonParser.parseString(payload);
+        if (!element.isJsonObject()) {
+            return Optional.empty();
+        }
+        var json = element.getAsJsonObject();
         try {
             if (json.has("moisture")) {
                 var value = json.get("moisture").getAsDouble();
