@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 public class MailSender implements Consumer<String> {
 
-    private static final String MAIL_URL = "http://127.0.0.1:8080/functions/mail";
+    private static final String MAIL_URL = "http://192.168.0.111:8080/function/mail";
 
     @Override
     public void accept(String payload) {
