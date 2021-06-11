@@ -1,7 +1,6 @@
 package com.openfaas.function;
 
 import java.util.Optional;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
