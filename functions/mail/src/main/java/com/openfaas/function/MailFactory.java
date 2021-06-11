@@ -1,4 +1,4 @@
-package com.cassel.function.mail;
+package com.openfaas.function;
 
 import java.util.Optional;
 

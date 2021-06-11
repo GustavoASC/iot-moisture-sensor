@@ -1,10 +1,11 @@
 version: 1.0
 provider:
   name: openfaas
-  gateway: http://192.168.10.247:8080
+  gateway: http://192.168.0.111:8080
 functions:
   mail:
     lang: java11
     handler: ./mail
     image: gustavoasc/mail:latest
-
+    secrets:
+    - mail-pass

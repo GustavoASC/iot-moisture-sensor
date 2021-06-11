@@ -1,5 +1,8 @@
-package com.cassel.function.mail;
+package com.openfaas.function;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 import javax.mail.Address;
 import javax.mail.Message;
@@ -43,7 +46,7 @@ public class Mail {
     public String getText() {
         return text;
     }
-    
+
     public void send() throws MessagingException {
         Message message = new MimeMessage(getSession());
         message.setFrom(new InternetAddress(from));
@@ -61,15 +64,23 @@ public class Mail {
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
-        Session session = Session.getDefaultInstance(props,
-                new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("testemonitorplantas@gmail.com",
-                        "aBC123456");
-            }
-        });
+        Session session = Session.getDefaultInstance(props, new Authenticator());
         session.setDebug(true);
         return session;
+    }
+
+    private class Authenticator extends javax.mail.Authenticator {
+        
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+            try {
+                String pass = Files.readString(Path.of("/var/openfaas/secrets/mail-pass"));
+                return new PasswordAuthentication(from, pass);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
     }
 
 }
