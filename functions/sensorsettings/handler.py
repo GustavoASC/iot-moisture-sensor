@@ -107,7 +107,9 @@ def handle(event, context):
             "headers": {
                 "Content-type": "text/plain; charset=utf-8",
                 "content-length": len(result),
-                "access-control-allow-origin": "*"
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
             },
             "body": result
         }
