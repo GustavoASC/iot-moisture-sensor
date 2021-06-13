@@ -1,4 +1,4 @@
-package com.cassel.function.sensorhandler;
+package com.openfaas.function;
 
 import com.openfaas.model.IHandler;
 import com.openfaas.model.IResponse;
@@ -9,7 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class Handler implements IHandler {
+public class Handler extends com.openfaas.model.AbstractHandler {
 
     public IResponse Handle(IRequest req) {
 
@@ -20,7 +20,7 @@ public class Handler implements IHandler {
         });
         
         Response res = new Response();
-        res.setBody("Hello, world!");
+        res.setBody("Corpo: " + req.getBody());
         return res;
     }
 

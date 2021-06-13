@@ -1,4 +1,4 @@
-package com.cassel.function.sensorhandler;
+package com.openfaas.function;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,7 +21,11 @@ public class MailSender implements Consumer<String> {
                                              .uri(new URI(MAIL_URL))
                                              .POST(BodyPublishers.ofString(payload))
                                              .build();
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            var body = response.body();
+            var status = response.statusCode();
+            var content = response.toString();
+
         } catch (URISyntaxException | IOException | InterruptedException e) {
             e.printStackTrace();
         }

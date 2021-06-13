@@ -1,4 +1,4 @@
-package com.cassel.function.sensorhandler;
+package com.openfaas.function;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

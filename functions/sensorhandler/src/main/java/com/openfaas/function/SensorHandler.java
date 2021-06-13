@@ -1,4 +1,4 @@
-package com.cassel.function.sensorhandler;
+package com.openfaas.function;
 
 import com.google.gson.JsonObject;
 

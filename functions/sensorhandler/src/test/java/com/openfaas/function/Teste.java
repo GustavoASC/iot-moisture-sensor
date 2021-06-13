@@ -1,4 +1,4 @@
-package com.cassel.function.sensorhandler;
+package com.openfaas.function;
 
 import java.util.Map;
 import com.openfaas.model.IRequest;
@@ -15,7 +15,9 @@ public class Teste {
             }
     
         };
-        handler.Handle(req);
+        var result = handler.Handle(req);
+        var body = result.getBody();
+        System.out.println("aqui");
     }
 
 
