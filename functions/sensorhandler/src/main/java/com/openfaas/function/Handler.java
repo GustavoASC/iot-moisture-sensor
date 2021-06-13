@@ -1,58 +1,37 @@
 package com.openfaas.function;
 
-import com.openfaas.model.IHandler;
 import com.openfaas.model.IResponse;
+
+import java.util.Optional;
+
+import com.openfaas.function.settings.SettingsLoader;
 import com.openfaas.model.IRequest;
 import com.openfaas.model.Response;
-import java.util.Optional;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class Handler extends com.openfaas.model.AbstractHandler {
 
     public IResponse Handle(IRequest req) {
-
-        var moistureOpt = extractMoisture(req); 
-        moistureOpt.ifPresent(moisture -> {
-            var settings = loadSettings();
-            new SensorHandler(settings).handleSensorData(moisture);
-        });
-        
         Response res = new Response();
-        res.setBody("Corpo: " + req.getBody());
+        var moistureOpt = extractMoisture(req);
+        if (moistureOpt.isPresent()) {
+            var settingsOpt = new SettingsLoader().loadFromDatabase();
+            if (settingsOpt.isPresent()) {
+                var settings = settingsOpt.get();
+                var moisture = moistureOpt.get();
+                new SensorHandler(settings).handleSensorData(moisture);
+                res.setBody("OK");
+            } else {
+                res.setBody("Could not load settings from database.");
+            }
+        } else {
+            res.setBody("Could not extract moisture from: " + req.getBody());
+        }
         return res;
     }
 
     Optional<Double> extractMoisture(IRequest req) {
         var payload = req.getBody();
-        var element = JsonParser.parseString(payload);
-        return extractMoisture(element);
-    }
-
-    private Optional<Double> extractMoisture(JsonElement element) {
-        if (element.isJsonObject()) {
-            var json = element.getAsJsonObject();
-            return extractMoisture(json);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private Optional<Double> extractMoisture(JsonObject json) {
-        try {
-            if (json.has("moisture")) {
-                var value = json.get("moisture").getAsDouble();
-                return Optional.of(value);
-            }
-            return Optional.empty();
-        } catch (NumberFormatException ex) {
-            return Optional.empty();
-        }
-    }
-
-    private Settings loadSettings() {
-        return Settings.of(5, 10, "guscassel@gmail.com");
+        return new MoistureExtractor().extractMoisture(payload);
     }
 
 }

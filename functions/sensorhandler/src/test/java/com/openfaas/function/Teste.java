@@ -17,7 +17,7 @@ public class Teste {
         };
         var result = handler.Handle(req);
         var body = result.getBody();
-        System.out.println("aqui");
+        System.out.println(body);
     }
 
 

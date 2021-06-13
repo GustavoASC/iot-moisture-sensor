@@ -1,6 +1,8 @@
 package com.openfaas.function;
 
-import com.google.gson.JsonObject;
+import com.openfaas.function.mail.MailData;
+import com.openfaas.function.mail.MailSender;
+import com.openfaas.function.settings.Settings;
 
 public class SensorHandler {
 
@@ -12,22 +14,20 @@ public class SensorHandler {
 
     public void handleSensorData(double moisture) {
         if (isOutOfRange(moisture)) {
-            var payload = buildPayload(moisture);
-            new MailSender().accept(payload);
+            var payload = buildEmailData(moisture);
+            new MailSender().send(payload);
         }
     }
 
     boolean isOutOfRange(double moisture) {
-        return moisture < settings.getLower() ||
-               moisture > settings.getHigher();
+        return moisture < settings.getMinMoisture();
     }
 
-    String buildPayload(double moisture) {
-        var object = new JsonObject();
-        object.addProperty("recipient", settings.getRecipient());
-        object.addProperty("subject", "Plant needs attention");
-        object.addProperty("text", "The plant needs attention");
-        return object.toString();
+    MailData buildEmailData(double moisture) {
+        var mail = MailData.of(settings.getEmail(),
+                               "Plant needs attention",
+                               "Water the plant, please! The soil has only " + moisture + "% of the expected moisture level, whereas the minimum accepted level is " + settings.getMinMoisture() + "%.");
+        return mail;
     }
     
 }
