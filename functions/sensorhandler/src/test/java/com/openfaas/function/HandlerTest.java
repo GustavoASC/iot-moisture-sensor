@@ -4,7 +4,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.Map;
 import java.util.Optional;
-
 import com.openfaas.model.IRequest;
 
 public class HandlerTest {
@@ -22,6 +21,36 @@ public class HandlerTest {
         };
         var moisture = handler.extractMoisture(req);
         assertEquals(Optional.of(10.0), moisture);
+    }
+    
+    @Test
+    public void validMoistureWithDecimalPointWithoutQuotesContent() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{ \"moisture\": 10.5}";
+            }
+    
+        };
+        var moisture = handler.extractMoisture(req);
+        assertEquals(Optional.of(10.5), moisture);
+    }
+    
+    @Test
+    public void validMoistureWithDecimalPointWithQuotesContent() {
+        Handler handler = new Handler();
+        IRequest req = new AbstractRequest() {
+
+            @Override
+            public String getBody() {
+                return "{ \"moisture\": \"10.5\"}";
+            }
+    
+        };
+        var moisture = handler.extractMoisture(req);
+        assertEquals(Optional.of(10.5), moisture);
     }
     
     @Test
