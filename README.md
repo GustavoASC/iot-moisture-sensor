@@ -1,4 +1,4 @@
-# Moisture sensor with serverless Computing
+# Moisture sensor with serverless computing
 
 This repo represents an IoT application to detect the soil moisture level, sending an email when the level is below the minimum. The main components were developed with serverless functions, making use of the OpenFaaS platform. This way, components are developed as stateless functions which communicate with each other through HTTP. The following pictures show the final hardware assembly, composed of: (a) ESP8266 NodeMCU, and (b) soil moisture sensor.
 
