@@ -15,7 +15,6 @@ public class Handler extends com.openfaas.model.AbstractHandler {
         try {
             var payload = req.getBody();
             var mailOpt = new MailFactory().createFromJsonText(payload);
-            // var mailOpt = Optional.empty();
             if (mailOpt.isPresent()) {
                 var mail = mailOpt.get();
                 try {                

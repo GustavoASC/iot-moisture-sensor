@@ -13,6 +13,12 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * Simple and immutable class used to send email.
+ * 
+ * The password for the sender email address is loaded from
+ * OpenFaaS secrets folder.
+ */
 public class Mail {
 
     private final String from;
